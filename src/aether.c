@@ -43,6 +43,7 @@ void aetherLoop(struct aether * aether) {
     while (!glfwWindowShouldClose(aether->window)) {
         aetherInput(aether);
         glClearColor(0.1, 0.3, 0.4, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(aether->window);
         glfwPollEvents();

@@ -6,6 +6,6 @@ int main(void) {
         printf("aetherInit() Failed. Exiting.\n");
         return -1;
     }
-
-    
+    aetherLoop(aether);
+    free(aether);
 }
