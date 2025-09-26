@@ -11,26 +11,40 @@ struct aether * aetherInit() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
     aether->window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Aether Renderer", NULL, NULL);
     if (aether->window == NULL) {
-        free(aether);
-        return NULL;
-    }
-
-    if (glewInit() != GLEW_OK) {
+        printf("Failed to create GLFW Window. Exiting.\n");
         free(aether);
         return NULL;
     }
 
     glfwMakeContextCurrent(aether->window);
     glfwSetFramebufferSizeCallback(aether->window, aetherFramebufferSizeCallback);
+    
+    GLenum glewStatus = glewInit();
+    if (glewStatus != GLEW_OK) {
+        printf("%s\n", glewGetErrorString(glewStatus));
+        printf("Failed to initialise GLEW. Exiting.\n");
+        free(aether);
+        return NULL;
+    }
+
     return aether;
+}
+
+void aetherInput(struct aether * aether) {
+    if (glfwGetKey(aether->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(aether->window, GLFW_TRUE);
+    }
 }
 
 void aetherLoop(struct aether * aether) {
     while (!glfwWindowShouldClose(aether->window)) {
-        
+        aetherInput(aether);
+        glClearColor(0.1, 0.3, 0.4, 1.0);
+
+        glfwSwapBuffers(aether->window);
+        glfwPollEvents();
     }
 }

@@ -5,6 +5,7 @@
 #define SCREEN_HEIGHT 480
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -13,6 +14,7 @@ struct aether {
 };
 
 struct aether * aetherInit();
+void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
