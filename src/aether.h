@@ -6,12 +6,14 @@
 
 #include <stdio.h>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>s
+#include <GLFW/glfw3.h>
 
 struct aether {
     GLFWwindow* window;
 };
 
 struct aether * aetherInit();
+void aetherLoop(struct aether * aether);
+void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 #endif
