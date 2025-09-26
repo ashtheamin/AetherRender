@@ -1,5 +1,5 @@
-#include <stdio.h>
+#include "aether.h"
 
 int main(void) {
-    printf("Hello Aether\n");
+    
 }
