@@ -4,33 +4,9 @@ void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
-struct aetherVertex* aetherVertexInit() {
-    struct aetherVertex* vertex = malloc(sizeof(struct aetherVertex));
-    vertex->data = NULL;
-    vertex->next = NULL;
-    return vertex;
-}
-
-void aetherVertexFree(struct aetherVertex* vertex) {
-    if (vertex == NULL) return;
-    struct aetherVertex* temp;
-    struct aetherVertex* next;
-    temp = vertex;
-    next = vertex;
-
-    while (next != NULL) {
-        next = temp->next;
-        free(temp);
-        temp = next;
-    }
-}
-
 struct aether * aetherInit() {
     struct aether* aether = malloc(sizeof(struct aether));
     if (aether == NULL) return NULL;
-
-    aether->vertices = aetherVertexInit();
-    if (aether->vertices == NULL) {free(aether);return NULL;};
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -76,7 +52,6 @@ void aetherLoop(struct aether * aether) {
 
 void aetherFree(struct aether * aether) {
     if (aether == NULL) return;
-    aetherVertexFree(aether->vertices);
     glfwDestroyWindow(aether->window);
     free(aether);
     return;
