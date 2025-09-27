@@ -2,9 +2,9 @@
 
 const char *aetherDefaultVertexShaderSource = 
     "#version 120\n"
-    "attribute vec2 coord2d;                  "
+    "attribute vec3 coord3d;                  "
     "void main(void) {                        "
-    "  gl_Position = vec4(coord2d, 0.0, 1.0); "
+    "  gl_Position = vec4(coord3d, 1.0);; "
     "}";
 
 const char *aetherDefaultFragmentShaderSource = 
@@ -81,8 +81,8 @@ struct aetherModel * aetherModelInit() {
         return NULL;
     }
 
-	model->coord3d = glGetAttribLocation(model->shader, "coord2d");
-	if (model->coord3d == -1) {
+	model->attributes.coord3d = glGetAttribLocation(model->shader, "coord3d");
+	if (model->attributes.coord3d == -1) {
 		printf("aetherModelInit(): Failed to bind coord3d attribute. Exiting.\n");
         free(model);
         return NULL;
@@ -155,8 +155,7 @@ void aetherLoop(struct aether * aether) {
 
         glUseProgram(aether->models->shader);
         glBindBuffer(GL_ARRAY_BUFFER, aether->models->VBO);
-        glVertexAttribPointer(
-            aether->models->coord3d, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(aether->models->attributes.coord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(aether->window);

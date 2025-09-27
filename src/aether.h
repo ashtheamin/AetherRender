@@ -10,11 +10,15 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+struct aetherModelAttributes {
+    GLint coord3d;
+};
+
 struct aetherModel {
     float *vertexData;
+    struct aetherModelAttributes attributes;
     unsigned int vertexSize;
     unsigned int VBO;
-    GLint coord3d;
     unsigned int shader;
     struct aetherModel* next;
 };

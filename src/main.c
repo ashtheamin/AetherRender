@@ -17,11 +17,10 @@ int main(void) {
     aether->models->vertexSize = sizeof(aetherDefaultTriangle);
 
     memcpy(aether->models->vertexData, aetherDefaultTriangle, sizeof(aetherDefaultTriangle));
-    glEnableVertexAttribArray(aether->models->coord3d);
+    glEnableVertexAttribArray(aether->models->attributes.coord3d);
 
     glGenBuffers(1, &aether->models->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, aether->models->VBO);
-
     glBufferData(GL_ARRAY_BUFFER, aether->models->vertexSize, aether->models->vertexData, GL_STATIC_DRAW);
 
     aetherLoop(aether);
