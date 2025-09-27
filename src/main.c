@@ -7,5 +7,6 @@ int main(void) {
         return -1;
     }
     aetherLoop(aether);
-    free(aether);
+    aetherFree(aether);
+    return 0;
 }

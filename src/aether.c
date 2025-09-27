@@ -49,3 +49,10 @@ void aetherLoop(struct aether * aether) {
         glfwPollEvents();
     }
 }
+
+void aetherFree(struct aether * aether) {
+    if (aether == NULL) return;
+    glfwDestroyWindow(aether->window);
+    free(aether);
+    return;
+}

@@ -16,6 +16,7 @@ struct aether {
 struct aether * aetherInit();
 void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
+void aetherFree(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 #endif
