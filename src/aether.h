@@ -9,11 +9,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+struct aetherVertex {
+    float *data;
+    struct aetherVertex* next;
+};
+
 struct aether {
     GLFWwindow* window;
+    struct aetherVertex *vertices;
 };
 
 struct aether * aetherInit();
+struct aetherVertex* aetherVertexInit();
+void aetherVertexFree(struct aetherVertex* vertex);
 void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);
