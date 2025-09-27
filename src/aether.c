@@ -4,15 +4,73 @@ void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
+unsigned int aetherShaderDefaultInit() {
+    unsigned int shader = 0;
+
+    unsigned int aetherVertexShader = 0;
+    aetherVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(aetherVertexShader, 1, &aetherDefaultVertexShaderSource, NULL);
+    glCompileShader(aetherVertexShader);
+
+    int success = 0;
+    char infoLog[512];
+    glGetShaderiv(aetherVertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(aetherVertexShader, 512, NULL, infoLog);
+        printf("aetherShaderInit(): Compiling vertex shader failed.\n. %s", infoLog);
+        return 0;
+    }
+
+    unsigned int aetherFragmentShader = 0;
+    aetherFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(aetherFragmentShader, 1, &aetherDefaultFragmentShaderSource, NULL);
+    glCompileShader(aetherFragmentShader);
+
+    success = 0;
+    glGetShaderiv(aetherFragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(aetherFragmentShader, 512, NULL, infoLog);
+        printf("aetherShaderInit(): Compiling Fragment shader failed.\n. %s", infoLog);
+        return 0;
+    }
+
+    shader = glCreateProgram();
+    glAttachShader(shader, aetherVertexShader);
+    glAttachShader(shader, aetherFragmentShader);
+    glLinkProgram(shader);
+
+    glGetProgramiv(shader, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(aetherFragmentShader, 512, NULL, infoLog);
+        printf("aetherShaderInit(): Compiling shader program failed.\n. %s", infoLog);
+        return 0;
+    }
+
+    glDeleteShader(aetherVertexShader);
+    glDeleteShader(aetherFragmentShader);
+
+    return shader;
+}
+
 struct aetherModel * aetherModelInit() {
     struct aetherModel* model = malloc(sizeof(struct aetherModel));
     if (model == NULL) return NULL;
 
     model->next = NULL;
     model->vertexData = NULL;
+
+    model->shader = aetherShaderDefaultInit();
+    if (model->shader == 0) {
+        printf("aetherModelInit(): Failed to initialise model. Exiting.\n");
+        free(model);
+        return NULL;
+    }
+
     model->VAO = 0;
     model->VBO = 0;
-    model->shader = 0;
+    
+    glGenBuffers(1, &model->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, model->VBO);
 
     return model;
 }

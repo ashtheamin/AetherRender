@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "shader.h"
 
 struct aetherModel {
     float* vertexData;
@@ -29,5 +30,6 @@ void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
+unsigned int aetherShaderDefaultInit();
 
 #endif
