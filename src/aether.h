@@ -6,14 +6,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "shader.h"
 
 struct aetherModel {
-    float* vertexData;
+    float *vertexData;
+    unsigned int vertexSize;
     unsigned int VBO;
-    unsigned int VAO;
+    GLint coord3d;
     unsigned int shader;
     struct aetherModel* next;
 };
@@ -31,5 +32,6 @@ void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 unsigned int aetherShaderDefaultInit();
+
 
 #endif

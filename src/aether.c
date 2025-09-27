@@ -1,5 +1,20 @@
 #include "aether.h"
 
+const char *aetherDefaultVertexShaderSource = 
+    "#version 120\n"
+    "attribute vec2 coord2d;                  "
+    "void main(void) {                        "
+    "  gl_Position = vec4(coord2d, 0.0, 1.0); "
+    "}";
+
+const char *aetherDefaultFragmentShaderSource = 
+    "#version 120\n"
+    "void main(void) {        "
+    "  gl_FragColor[0] = 0.0; "
+    "  gl_FragColor[1] = 0.0; "
+    "  gl_FragColor[2] = 1.0; "
+    "}";
+
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
@@ -66,11 +81,14 @@ struct aetherModel * aetherModelInit() {
         return NULL;
     }
 
-    model->VAO = 0;
+	model->coord3d = glGetAttribLocation(model->shader, "coord2d");
+	if (model->coord3d == -1) {
+		printf("aetherModelInit(): Failed to bind coord3d attribute. Exiting.\n");
+        free(model);
+        return NULL;
+	}
+
     model->VBO = 0;
-    
-    glGenBuffers(1, &model->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, model->VBO);
 
     return model;
 }
@@ -83,6 +101,7 @@ void aetherModelFree(struct aetherModel* model) {
 
     while (next != NULL) {
         next = temp->next;
+        if (temp->vertexData != NULL) free(temp->vertexData);
         free(temp);
         temp = next;
     }
@@ -93,9 +112,7 @@ struct aether * aetherInit() {
     if (aether == NULL) return NULL;
 
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    
+
     aether->window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Aether Renderer", NULL, NULL);
     if (aether->window == NULL) {
         printf("Failed to create GLFW Window. Exiting.\n");
@@ -115,6 +132,11 @@ struct aether * aetherInit() {
     }
 
     aether->models = aetherModelInit();
+    if (aether->models == NULL) {
+        printf("aetherInit() Failed. Returning.\n");
+        free(aether);
+        return NULL;
+    }
 
     return aether;
 }
@@ -128,8 +150,14 @@ void aetherInput(struct aether * aether) {
 void aetherLoop(struct aether * aether) {
     while (!glfwWindowShouldClose(aether->window)) {
         aetherInput(aether);
-        glClearColor(0.1, 0.3, 0.4, 1.0);
+        glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(aether->models->shader);
+        glBindBuffer(GL_ARRAY_BUFFER, aether->models->VBO);
+        glVertexAttribPointer(
+            aether->models->coord3d, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(aether->window);
         glfwPollEvents();
