@@ -9,11 +9,22 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+struct aetherModel {
+    float* vertexData;
+    unsigned int VBO;
+    unsigned int VAO;
+    unsigned int shader;
+    struct aetherModel* next;
+};
+
 struct aether {
     GLFWwindow* window;
+    struct aetherModel* models;
 };
 
 struct aether * aetherInit();
+struct aetherModel * aetherModelInit();
+void aetherModelFree(struct aetherModel* model);
 void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);

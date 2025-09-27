@@ -4,6 +4,32 @@ void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
+struct aetherModel * aetherModelInit() {
+    struct aetherModel* model = malloc(sizeof(struct aetherModel));
+    if (model == NULL) return NULL;
+
+    model->next = NULL;
+    model->vertexData = NULL;
+    model->VAO = 0;
+    model->VBO = 0;
+    model->shader = 0;
+
+    return model;
+}
+
+void aetherModelFree(struct aetherModel* model) {
+    if (model == NULL) return;
+
+    struct aetherModel* temp = model;
+    struct aetherModel* next = model;
+
+    while (next != NULL) {
+        next = temp->next;
+        free(temp);
+        temp = next;
+    }
+}
+
 struct aether * aetherInit() {
     struct aether* aether = malloc(sizeof(struct aether));
     if (aether == NULL) return NULL;
@@ -30,6 +56,8 @@ struct aether * aetherInit() {
         return NULL;
     }
 
+    aether->models = aetherModelInit();
+
     return aether;
 }
 
@@ -53,6 +81,7 @@ void aetherLoop(struct aether * aether) {
 void aetherFree(struct aether * aether) {
     if (aether == NULL) return;
     glfwDestroyWindow(aether->window);
+    aetherModelFree(aether->models);
     free(aether);
     return;
 }
