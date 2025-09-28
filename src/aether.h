@@ -12,13 +12,15 @@
 
 struct aetherModelAttributes {
     GLint coord3d;
+    GLint colour;
 };
 
 struct aetherModel {
-    float *vertexData;
     struct aetherModelAttributes attributes;
     unsigned int vertexSize;
+    unsigned int IBO;
     unsigned int VBO;
+    unsigned int colours;
     unsigned int shader;
     struct aetherModel* next;
 };
@@ -36,6 +38,5 @@ void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 unsigned int aetherShaderDefaultInit();
-
-
+void aetherModelDefaultCubeInit(struct aetherModel* model);
 #endif
