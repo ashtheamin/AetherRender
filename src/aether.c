@@ -5,8 +5,11 @@ const char *aetherDefaultVertexShaderSource =
     "attribute vec3 coord3d;"
     "attribute vec3 colour;"
     "varying vec3 f_colour;"
+    "uniform mat4 model;"
+    "uniform mat4 view;"
+    "uniform mat4 projection;"
     "void main(void) {"
-    "  gl_Position = vec4(coord3d, 1.0);"
+    "  gl_Position = projection * view * model * vec4(coord3d, 1.0);"
     "  f_colour = colour;"
 "}";
 
@@ -142,6 +145,8 @@ struct aetherModel * aetherModelInit() {
     if (model == NULL) return NULL;
 
     model->next = NULL;
+    model->IBO = 0;
+    model->VBO = 0;
 
     model->shader = aetherShaderDefaultInit();
     if (model->shader == 0) {
@@ -164,8 +169,9 @@ struct aetherModel * aetherModelInit() {
         return NULL;
 	}
 
-    model->IBO = 0;
-    model->VBO = 0;
+    model->uniforms.view = glGetUniformLocation(model->shader, "view");
+    model->uniforms.model = glGetUniformLocation(model->shader, "model");
+    model->uniforms.projection = glGetUniformLocation(model->shader, "projection");
 
     return model;
 }
@@ -230,16 +236,35 @@ void aetherLoop(struct aether * aether) {
         glClearColor(0, 0.0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(aether->models->shader);
-        glBindBuffer(GL_ARRAY_BUFFER, aether->models->VBO);
-        glVertexAttribPointer(aether->models->attributes.coord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ARRAY_BUFFER, aether->models->colours);
-        glVertexAttribPointer(aether->models->attributes.colour, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aether->models->IBO);
-        int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-        glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+        struct aetherModel* model = aether->models;
+
+        while (model != NULL) {
+            mat4 modelUniform = GLM_MAT4_IDENTITY_INIT;
+            mat4 view = GLM_MAT4_IDENTITY_INIT;
+            mat4 projection = GLM_MAT4_IDENTITY_INIT;
+
+            glm_perspective(glm_rad(45.0f), (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT, 0.1f, 100.0f, projection);
+            
+            vec3 translation = {1.2f, -0.3f, -5.0f};
+            glm_translate(view, translation);
+
+            glUniformMatrix4fv(model->uniforms.model, 1, GL_FALSE, modelUniform[0]);
+            glUniformMatrix4fv(model->uniforms.view, 1, GL_FALSE, view[0]);
+            glUniformMatrix4fv(model->uniforms.projection, 1, GL_FALSE, projection[0]);
+
+            glUseProgram(aether->models->shader);
+            glBindBuffer(GL_ARRAY_BUFFER, aether->models->VBO);
+            glVertexAttribPointer(aether->models->attributes.coord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            
+            glBindBuffer(GL_ARRAY_BUFFER, aether->models->colours);
+            glVertexAttribPointer(aether->models->attributes.colour, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, aether->models->IBO);
+            int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+            glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+            model = model->next;
+        }
 
         glfwSwapBuffers(aether->window);
         glfwPollEvents();

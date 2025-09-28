@@ -9,14 +9,23 @@
 #include <string.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <cglm/cglm.h>
 
 struct aetherModelAttributes {
-    GLint coord3d;
-    GLint colour;
+    int coord3d;
+    int colour;
 };
+
+struct aetherModelUniforms {
+    int view;
+    int model;
+    int projection;
+};
+
 
 struct aetherModel {
     struct aetherModelAttributes attributes;
+    struct aetherModelUniforms uniforms;
     unsigned int vertexSize;
     unsigned int IBO;
     unsigned int VBO;
