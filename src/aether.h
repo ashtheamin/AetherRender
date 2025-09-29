@@ -34,9 +34,29 @@ struct aetherModel {
     struct aetherModel* next;
 };
 
+struct aetherMouse {
+    float lastX;
+    float lastY;
+    float sensitivity;
+    bool usedBefore;
+};
+
+struct aetherCamera {
+    vec3 position;
+    vec3 front;
+    vec3 up;
+
+    float speed;
+    float yaw;
+    float pitch;
+
+    struct aetherMouse mouse;
+};
+
 struct aether {
     GLFWwindow* window;
     struct aetherModel* models;
+    struct aetherCamera camera;
 };
 
 struct aether * aetherInit();
@@ -46,6 +66,7 @@ void aetherInput(struct aether * aether);
 void aetherLoop(struct aether * aether);
 void aetherFree(struct aether * aether);
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
+void aetherMouseCallback(GLFWwindow* window, double x, double y);
 unsigned int aetherShaderDefaultInit();
 void aetherModelDefaultCubeInit(struct aetherModel* model);
 #endif

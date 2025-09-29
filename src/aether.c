@@ -202,9 +202,10 @@ struct aether * aetherInit() {
         return NULL;
     }
 
+    glfwSetWindowUserPointer(aether->window, aether);
     glfwMakeContextCurrent(aether->window);
     glfwSetFramebufferSizeCallback(aether->window, aetherFramebufferSizeCallback);
-    
+
     GLenum glewStatus = glewInit();
     if (glewStatus != GLEW_OK) {
         printf("%s\n", glewGetErrorString(glewStatus));
@@ -220,7 +221,23 @@ struct aether * aetherInit() {
         return NULL;
     }
 
+    // Camera init code.
+    memcpy(aether->camera.position, (vec3){0.0, 0.0, 0.0}, sizeof(vec3));
+    memcpy(aether->camera.front, (vec3){0.0, 0.0, -1.0}, sizeof(vec3));
+    memcpy(aether->camera.up, (vec3){0.0, 1.0, 0.0}, sizeof(vec3));
+    aether->camera.yaw = -90.0;
+    aether->camera.pitch = 0.0;
+    aether->camera.speed = 2.5;
+
+    aether->camera.mouse.lastX = SCREEN_WIDTH/2;
+    aether->camera.mouse.lastY = SCREEN_HEIGHT/2;
+    aether->camera.mouse.usedBefore = false;
+    aether->camera.mouse.sensitivity = 0.1;
+
     glEnable(GL_DEPTH_TEST);
+
+    glfwSetCursorPosCallback(aether->window, aetherMouseCallback);
+    glfwSetInputMode(aether->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     return aether;
 }
 
@@ -244,8 +261,12 @@ void aetherLoop(struct aether * aether) {
             mat4 projection = GLM_MAT4_IDENTITY_INIT;
 
             glm_perspective(glm_rad(45.0f), (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT, 0.1f, 100.0f, projection);
-            
-            vec3 translation = {1.2f, -0.3f, -5.0f};
+
+            vec3 lookingat = {0.0, 0.0, 0.0};
+            glm_vec3_add(aether->camera.position, aether->camera.front, lookingat);
+            glm_lookat(aether->camera.position, lookingat, aether->camera.up, view);
+
+            vec3 translation = {5.0f, -5.0f, -10.0f};
             glm_translate(view, translation);
 
             glUniformMatrix4fv(model->uniforms.model, 1, GL_FALSE, modelUniform[0]);
@@ -277,4 +298,50 @@ void aetherFree(struct aether * aether) {
     aetherModelFree(aether->models);
     free(aether);
     return;
+   
+}
+
+void aetherMouseCallback(GLFWwindow* window, double x, double y) {
+    struct aether* aether = NULL;
+    aether = glfwGetWindowUserPointer(window);
+    // Set the last x and y mouse positions
+    if (aether->camera.mouse.usedBefore == false) {
+        aether->camera.mouse.usedBefore = true;
+        aether->camera.mouse.lastX = x;
+        aether->camera.mouse.lastY = y;
+    }
+
+    // Get the difference between the last mouse position and current
+    float x_offset = x - aether->camera.mouse.lastX;
+    float y_offset = y - aether->camera.mouse.lastY;
+
+    // Store the current mouse positions to be the last
+    aether->camera.mouse.lastX = x;
+    aether->camera.mouse.lastY = y;
+
+    // Multiply the difference in mouse position with sensitivty
+    x_offset = x_offset * aether->camera.mouse.sensitivity;
+    y_offset = y_offset * aether->camera.mouse.sensitivity;
+
+    // Add the movement difference to the camera's viewing angles.
+    aether->camera.yaw = aether->camera.yaw + x_offset;
+    aether->camera.pitch = aether->camera.pitch - y_offset;
+
+    // Lock the camera's pitch so it does not go too far up or down
+    if (aether->camera.pitch > 89.0) {
+        aether->camera.pitch = 89.0;
+    }
+
+    if (aether->camera.pitch < -89.0) {
+        aether->camera.pitch = -89.0;
+    }
+
+    // Calculate the angles that the vector the camera is looking at needs to change with.
+    vec3 direction = {0.0, 0.0, 0.0};
+    direction[0] = cos(glm_rad(aether->camera.yaw)) * cos(glm_rad(aether->camera.pitch));
+    direction[1] = sin(glm_rad(aether->camera.pitch));
+    direction[2] = sin(glm_rad(aether->camera.yaw)) * cos(glm_rad(aether->camera.pitch));
+
+    // Add the movement difference to the vector the camera is looking at.
+    glm_vec3_normalize_to(direction, aether->camera.front);
 }
