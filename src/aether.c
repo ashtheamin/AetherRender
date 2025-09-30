@@ -89,7 +89,7 @@ void aetherModelDefaultCubeInit(struct aetherModel* model) {
 }
 
 void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    glViewport(0, 0, width, height);
 }
 
 unsigned int aetherShaderDefaultInit() {
