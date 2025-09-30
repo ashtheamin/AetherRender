@@ -54,10 +54,16 @@ struct aetherCamera {
     struct aetherMouse mouse;
 };
 
+struct aetherTiming {
+    float deltaTime;
+    float lastTime;
+};
+
 struct aether {
     GLFWwindow* window;
     struct aetherModel* models;
     struct aetherCamera camera;
+    struct aetherTiming timing;
 };
 
 struct aether * aetherInit();
@@ -70,4 +76,5 @@ void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void aetherMouseCallback(GLFWwindow* window, double x, double y);
 unsigned int aetherShaderDefaultInit();
 void aetherModelDefaultCubeInit(struct aetherModel* model);
+void aetherUpdateTiming(struct aether* aether);
 #endif

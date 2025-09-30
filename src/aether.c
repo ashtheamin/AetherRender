@@ -227,12 +227,15 @@ struct aether * aetherInit() {
     memcpy(aether->camera.up, (vec3){0.0, 1.0, 0.0}, sizeof(vec3));
     aether->camera.yaw = -90.0;
     aether->camera.pitch = 0.0;
-    aether->camera.speed = 2.5;
+    aether->camera.speed = 5;
 
     aether->camera.mouse.lastX = SCREEN_WIDTH/2;
     aether->camera.mouse.lastY = SCREEN_HEIGHT/2;
     aether->camera.mouse.usedBefore = false;
     aether->camera.mouse.sensitivity = 0.1;
+
+    aether->timing.deltaTime = 0.0;
+    aether->timing.lastTime = 0.0;
 
     glEnable(GL_DEPTH_TEST);
 
@@ -245,10 +248,40 @@ void aetherInput(struct aether * aether) {
     if (glfwGetKey(aether->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(aether->window, GLFW_TRUE);
     }
+
+    float speed = aether->camera.speed * aether->timing.deltaTime;
+    vec3 updatedPosition = {0.0, 0.0, 0.0};
+
+    if (glfwGetKey(aether->window, GLFW_KEY_W) == GLFW_PRESS) {
+        glm_vec3_scale(aether->camera.front, speed, updatedPosition);
+        glm_vec3_add(aether->camera.position, updatedPosition, aether->camera.position);
+    }
+
+    if (glfwGetKey(aether->window, GLFW_KEY_S) == GLFW_PRESS) {
+        glm_vec3_scale(aether->camera.front, speed, updatedPosition);
+        glm_vec3_negate(updatedPosition);
+        glm_vec3_add(aether->camera.position, updatedPosition, aether->camera.position);
+    }
+
+    if (glfwGetKey(aether->window, GLFW_KEY_A) == GLFW_PRESS) {
+        glm_vec3_cross(aether->camera.front, aether->camera.up, updatedPosition);
+        glm_vec3_normalize(updatedPosition);
+        glm_vec3_scale(updatedPosition, speed, updatedPosition);
+        glm_vec3_negate(updatedPosition);
+        glm_vec3_add(updatedPosition, aether->camera.position, aether->camera.position);
+    }
+
+    if (glfwGetKey(aether->window, GLFW_KEY_D) == GLFW_PRESS) {
+        glm_vec3_cross(aether->camera.front, aether->camera.up, updatedPosition);
+        glm_vec3_normalize(updatedPosition);
+        glm_vec3_scale(updatedPosition, speed, updatedPosition);
+        glm_vec3_add(updatedPosition, aether->camera.position, aether->camera.position);
+    }
 }
 
 void aetherLoop(struct aether * aether) {
     while (!glfwWindowShouldClose(aether->window)) {
+        aetherUpdateTiming(aether);
         aetherInput(aether);
         glClearColor(0, 0.0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -344,4 +377,10 @@ void aetherMouseCallback(GLFWwindow* window, double x, double y) {
 
     // Add the movement difference to the vector the camera is looking at.
     glm_vec3_normalize_to(direction, aether->camera.front);
+}
+
+void aetherUpdateTiming(struct aether* aether) {
+    float currentTime = glfwGetTime();
+    aether->timing.deltaTime = currentTime - aether->timing.lastTime;
+    aether->timing.lastTime = currentTime;
 }
