@@ -1,1 +1,5 @@
+macOS
 gcc -o main src/main.c src/aether.c -I /opt/local/include/ -L /opt/local/lib/ `pkg-config --libs glew glfw3` -g -fsanitize=address,undefined -Wall -lm
+
+Linux
+ gcc -o main src/main.c src/aether.c -lGL -lGLEW -lglfw -lcglm -lm -fsanitize=address,undefined,leak -g
