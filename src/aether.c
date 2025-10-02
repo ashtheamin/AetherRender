@@ -145,6 +145,8 @@ struct aetherModel * aetherModelInit() {
     model->next = NULL;
     model->IBO = 0;
     model->VBO = 0;
+    vec3 position = {0.0, 0.0, 0.0};
+    glm_vec3_copy(position, model->position);
 
     model->shader = aetherShaderDefaultInit();
     if (model->shader == 0) {
@@ -297,8 +299,7 @@ void aetherLoop(struct aether * aether) {
             glm_vec3_add(aether->camera.position, aether->camera.front, lookingat);
             glm_lookat(aether->camera.position, lookingat, aether->camera.up, view);
 
-            vec3 translation = {5.0f, -5.0f, -10.0f};
-            glm_translate(view, translation);
+            glm_translate(modelUniform, model->position);
 
             glUniformMatrix4fv(model->uniforms.model, 1, GL_FALSE, modelUniform[0]);
             glUniformMatrix4fv(model->uniforms.view, 1, GL_FALSE, view[0]);

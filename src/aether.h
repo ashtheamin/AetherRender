@@ -26,6 +26,7 @@ struct aetherModelUniforms {
 struct aetherModel {
     struct aetherModelAttributes attributes;
     struct aetherModelUniforms uniforms;
+    vec3 position;
     unsigned int vertexSize;
     unsigned int IBO;
     unsigned int VBO;
