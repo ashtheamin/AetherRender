@@ -77,6 +77,7 @@ unsigned int aetherShaderDefaultInit() {
         "attribute vec3 coord3d;"
         "attribute vec3 colour;"
         "varying vec3 f_colour;"
+        "uniform float ambientStrength;"
         "uniform mat4 model;"
         "uniform mat4 view;"
         "uniform mat4 projection;"
@@ -88,6 +89,7 @@ unsigned int aetherShaderDefaultInit() {
     const char *aetherDefaultFragmentShaderSource = 
         "#version 120\n"
         "varying vec3 f_colour;"
+        "uniform float ambientStrength;"
         "void main(void) {        "
             "gl_FragColor = vec4(f_colour.r, f_colour.g, f_colour.b, 1.0);"
         "}";
@@ -173,6 +175,7 @@ struct aetherModel * aetherModelInit() {
     model->uniforms.view = glGetUniformLocation(model->shader, "view");
     model->uniforms.model = glGetUniformLocation(model->shader, "model");
     model->uniforms.projection = glGetUniformLocation(model->shader, "projection");
+    model->uniforms.ambientStrength = glGetUniformLocation(model->shader, "ambientStrength");
 
     return model;
 }
@@ -237,6 +240,8 @@ struct aether * aetherInit() {
 
     aether->timing.deltaTime = 0.0;
     aether->timing.lastTime = 0.0;
+
+    aether->ambientLightStrength = 0.2;
 
     glEnable(GL_DEPTH_TEST);
 
@@ -303,6 +308,7 @@ void aetherLoop(struct aether * aether) {
             glm_translate(modelUniform, model->position);
             glm_scale(modelUniform, model->scale);
 
+            glUniform1f(model->uniforms.ambientStrength, aether->ambientLightStrength);
             glUniformMatrix4fv(model->uniforms.model, 1, GL_FALSE, modelUniform[0]);
             glUniformMatrix4fv(model->uniforms.view, 1, GL_FALSE, view[0]);
             glUniformMatrix4fv(model->uniforms.projection, 1, GL_FALSE, projection[0]);

@@ -21,6 +21,7 @@ struct aetherModelUniforms {
     int view;
     int model;
     int projection;
+    int ambientStrength;
 };
 
 struct aetherModel {
@@ -65,6 +66,7 @@ struct aether {
     struct aetherModel* models;
     struct aetherCamera camera;
     struct aetherTiming timing;
+    float ambientLightStrength;
 };
 
 struct aether * aetherInit();
