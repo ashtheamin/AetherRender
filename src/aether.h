@@ -23,7 +23,6 @@ struct aetherModelUniforms {
     int projection;
 };
 
-
 struct aetherModel {
     struct aetherModelAttributes attributes;
     struct aetherModelUniforms uniforms;

@@ -1,26 +1,5 @@
 #include "aether.h"
 
-const char *aetherDefaultVertexShaderSource = 
-    "#version 120\n"
-    "attribute vec3 coord3d;"
-    "attribute vec3 colour;"
-    "varying vec3 f_colour;"
-    "uniform mat4 model;"
-    "uniform mat4 view;"
-    "uniform mat4 projection;"
-    "void main(void) {"
-    "  gl_Position = projection * view * model * vec4(coord3d, 1.0);"
-    "  f_colour = colour;"
-"}";
-
-
-const char *aetherDefaultFragmentShaderSource = 
-    "#version 120\n"
-    "varying vec3 f_colour;"
-    "void main(void) {        "
-        "gl_FragColor = vec4(f_colour.r, f_colour.g, f_colour.b, 1.0);"
-    "}";
-
 void aetherModelDefaultCubeInit(struct aetherModel* model) {
     if(model == NULL) return;
     
@@ -93,6 +72,25 @@ void aetherFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 unsigned int aetherShaderDefaultInit() {
+    const char *aetherDefaultVertexShaderSource = 
+        "#version 120\n"
+        "attribute vec3 coord3d;"
+        "attribute vec3 colour;"
+        "varying vec3 f_colour;"
+        "uniform mat4 model;"
+        "uniform mat4 view;"
+        "uniform mat4 projection;"
+        "void main(void) {"
+        "  gl_Position = projection * view * model * vec4(coord3d, 1.0);"
+        "  f_colour = colour;"
+    "}";
+
+    const char *aetherDefaultFragmentShaderSource = 
+        "#version 120\n"
+        "varying vec3 f_colour;"
+        "void main(void) {        "
+            "gl_FragColor = vec4(f_colour.r, f_colour.g, f_colour.b, 1.0);"
+        "}";
     unsigned int shader = 0;
 
     unsigned int aetherVertexShader = 0;
